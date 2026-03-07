@@ -28,7 +28,10 @@ export default class App {
       this.setupRouting();
       this.setupErrorHandlers();
       await connectDatabase();
-      this.listen();
+
+      if (!process.env.VERCEL) {
+        this.listen();
+      }
     } catch (e) {
       logger.error(`Failed to start application: ${e}`);
       process.exit(1);
