@@ -9,49 +9,39 @@ import { appConfig } from "@config/index";
 import { errorHandler, notFoundHandler } from "@middlewares/error.middlewares";
 import v1Router from "@modules/v1/index";
 
-export default class App {
-  public app: Application;
+const app: Application = express();
 
-  constructor() {
-    this.app = express();
-  }
+const setupMiddlewares = () => {
+  app.use(helmet());
+  app.use(cors());
+  app.use(cookieParser());
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+};
 
-  private listen() {
-    this.app.listen(appConfig.app.port, () => {
+const setupRouting = () => {
+  app.use("/v1", v1Router);
+};
+
+const setupErrorHandlers = () => {
+  app.use(errorHandler);
+  app.use(notFoundHandler);
+};
+
+export const startApp = async () => {
+  try {
+    setupMiddlewares();
+    setupRouting();
+    setupErrorHandlers();
+    await connectDatabase();
+
+    app.listen(appConfig.app.port, () => {
       logger.info(`Server started and running on port ${appConfig.app.port}`);
     });
+  } catch (e) {
+    logger.error(`Failed to start application: ${e}`);
+    process.exit(1);
   }
+};
 
-  public async startApp() {
-    try {
-      this.setupMiddlewares();
-      this.setupRouting();
-      this.setupErrorHandlers();
-      await connectDatabase();
-
-      if (!process.env.VERCEL) {
-        this.listen();
-      }
-    } catch (e) {
-      logger.error(`Failed to start application: ${e}`);
-      process.exit(1);
-    }
-  }
-
-  private setupErrorHandlers() {
-    this.app.use(errorHandler);
-    this.app.use(notFoundHandler);
-  }
-
-  private setupMiddlewares() {
-    this.app.use(helmet());
-    this.app.use(cors());
-    this.app.use(cookieParser());
-    this.app.use(express.json());
-    this.app.use(express.urlencoded({ extended: true }));
-  }
-
-  private setupRouting() {
-    this.app.use("/v1", v1Router);
-  }
-}
+export default app;

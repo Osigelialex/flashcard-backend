@@ -1,6 +1,5 @@
-import App from "./app";
+import app, { startApp } from "./app";
 
-const app = new App();
-app.startApp();
+startApp();
 
-export default app.app;
+export default app;
