@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CardType {
+  term
+  qa
+}
+
+enum BloomLevel {
+  recall
+  comprehension
+  application
+  analysis
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String
+  password      String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  flashCards    FlashCard[]
+  flashCardSets FlashCardSet[]
+}
+
+model FlashCardSet {
+  id         String      @id @default(cuid())
+  topic      String
+  summary    String
+  userId     String
+  user       User        @relation(fields: [userId], references: [id])
+  flashCards FlashCard[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model FlashCard {
+  id         String        @id @default(cuid())
+  question   String
+  answer     String
+  type       CardType
+  bloomLevel BloomLevel
+  userId     String
+  user       User          @relation(fields: [userId], references: [id])
+  setId      String?
+  set        FlashCardSet? @relation(fields: [setId], references: [id])
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
