@@ -2,7 +2,6 @@ import { Router } from "express";
 import FlashcardController from "./flashcard.controller";
 import dtoValidationMiddleware from "@middlewares/validator.middleware";
 import {
-  GenerateFlashcardDto,
   QueryFlashCardDTO,
   UpdateFlashCardDTO,
   UpdateFlashcardSetDTO,
@@ -10,13 +9,27 @@ import {
 import { authMiddleware } from "@middlewares/auth.middlewares";
 import { PaginationDTO } from "@lib/core/dto";
 import { upload } from "@lib/core/storage";
+import { Request, Response, NextFunction } from "express";
+import { MulterError } from "multer";
+import { HttpException } from "@lib/core/error";
+import { StatusCodes } from "http-status-codes";
 
 const router: Router = Router();
 
 router.post(
   "/",
   authMiddleware,
-  upload.single("note"),
+  (req: Request, res: Response, next: NextFunction) => {
+    upload.single("note")(req, res, (err) => {
+      if (err instanceof MulterError || err instanceof HttpException) {
+        return next(new HttpException(StatusCodes.BAD_REQUEST, err.message));
+      }
+      if (err) {
+        return next(new HttpException(StatusCodes.BAD_REQUEST, err.message));
+      }
+      next();
+    });
+  },
   FlashcardController.generate,
 );
 
