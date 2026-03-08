@@ -1,5 +1,7 @@
 import multer from "multer";
 import path from "path";
+import { HttpException } from "./error";
+import { StatusCodes } from "http-status-codes";
 
 export const ACCEPTED_MIME_TYPES = [
   "text/plain",
@@ -22,7 +24,12 @@ export const upload = multer({
     if (ACCEPTED_MIME_TYPES.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error("Only .txt, .pdf, and .docx files are supported"));
+      cb(
+        new HttpException(
+          StatusCodes.BAD_REQUEST,
+          "Only .txt, .pdf, and .docx files are supported",
+        ),
+      );
     }
   },
 });
