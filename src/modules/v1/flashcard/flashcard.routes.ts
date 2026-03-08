@@ -1,7 +1,7 @@
 import { Router } from "express";
 import FlashcardController from "./flashcard.controller";
 import dtoValidationMiddleware from "@middlewares/validator.middleware";
-import { GenerateFlashcardDto } from "./flashcard.dto";
+import { GenerateFlashcardDto, UpdateFlashCardDTO } from "./flashcard.dto";
 import { authMiddleware } from "@middlewares/auth.middlewares";
 import { PaginationDTO } from "@lib/core/dto";
 
@@ -13,6 +13,15 @@ router.post(
   dtoValidationMiddleware(GenerateFlashcardDto),
   FlashcardController.generate,
 );
+
+router.patch(
+  "/:id",
+  authMiddleware,
+  dtoValidationMiddleware(UpdateFlashCardDTO),
+  FlashcardController.updateFlashCard,
+);
+
+router.delete("/:id", authMiddleware, FlashcardController.deleteFlashCard);
 
 router.get(
   "/sets",

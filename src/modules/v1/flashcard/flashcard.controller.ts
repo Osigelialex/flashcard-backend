@@ -47,4 +47,27 @@ export default class FlashcardController {
       data,
     });
   };
+
+  static updateFlashCard = async (req: Request, res: Response) => {
+    const result = await this.flashcardService.updateFlashCard(
+      req.params.id as any,
+      req.body,
+    );
+    return res.status(StatusCodes.OK).json({
+      status: true,
+      message: "Flashcard updated successfully",
+      data: result,
+    });
+  };
+
+  static deleteFlashCard = async (req: Request, res: Response) => {
+    const result = await this.flashcardService.deleteFlashCard(
+      req.params.id as any,
+    );
+    return res.status(StatusCodes.OK).json({
+      status: true,
+      message: "Flashcard deleted",
+      data: null,
+    });
+  };
 }

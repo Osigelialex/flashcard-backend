@@ -5,6 +5,7 @@ import { PaginationDTO } from "@lib/core/dto";
 import { appConstants } from "@config/constants";
 import { HttpException } from "@lib/core/error";
 import { StatusCodes } from "http-status-codes";
+import { UpdateFlashCardDTO } from "./flashcard.dto";
 
 export class FlashcardService {
   private readonly geminiService: GeminiService = new GeminiService(
@@ -82,5 +83,36 @@ export class FlashcardService {
       ...flashcardResponse,
       id: flashcardSet.id,
     };
+  }
+
+  public async updateFlashCard(flashcardId: string, dto: UpdateFlashCardDTO) {
+    const flashcard = await prisma.flashCard.findUnique({
+      where: { id: flashcardId },
+    });
+
+    if (!flashcard) {
+      throw new HttpException(StatusCodes.NOT_FOUND, "Flashcard not found");
+    }
+
+    const updatedFlashCard = await prisma.flashCard.update({
+      where: { id: flashcardId },
+      data: dto,
+    });
+
+    return updatedFlashCard;
+  }
+
+  public async deleteFlashCard(flashcardId: string) {
+    const flashcard = await prisma.flashCard.findUnique({
+      where: { id: flashcardId },
+    });
+
+    if (!flashcard) {
+      throw new HttpException(StatusCodes.NOT_FOUND, "Flashcard not found");
+    }
+
+    await prisma.flashCard.delete({
+      where: { id: flashcardId },
+    });
   }
 }
