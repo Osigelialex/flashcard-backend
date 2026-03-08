@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { FlashcardService } from "./flashcard.service";
 import { StatusCodes } from "http-status-codes";
+import fs from "fs";
 
 export default class FlashcardController {
   private static flashcardService = new FlashcardService();
@@ -57,19 +58,36 @@ export default class FlashcardController {
   };
 
   static generate = async (req: Request, res: Response) => {
-    const { notes } = req.body;
     const userId = req.user.id;
+    const file = req.file;
 
-    const data = await this.flashcardService.generateAndSaveFlashcards(
-      userId,
-      notes,
-    );
+    if (!file) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: false,
+        message: "Provide a file upload",
+      });
+    }
 
-    return res.status(StatusCodes.CREATED).json({
-      status: true,
-      message: "Flashcards generated successfully",
-      data,
-    });
+    try {
+      const input = {
+        path: file.path,
+        mimeType: file.mimetype,
+        displayName: file.originalname,
+      };
+
+      const data = await this.flashcardService.generateAndSaveFlashcards(
+        userId,
+        input,
+      );
+
+      return res.status(StatusCodes.CREATED).json({
+        status: true,
+        message: "Flashcards generated successfully",
+        data,
+      });
+    } finally {
+      if (file && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    }
   };
 
   static updateFlashCard = async (req: Request, res: Response) => {

@@ -9,13 +9,14 @@ import {
 } from "./flashcard.dto";
 import { authMiddleware } from "@middlewares/auth.middlewares";
 import { PaginationDTO } from "@lib/core/dto";
+import { upload } from "@lib/core/storage";
 
 const router: Router = Router();
 
 router.post(
   "/",
   authMiddleware,
-  dtoValidationMiddleware(GenerateFlashcardDto),
+  upload.single("note"),
   FlashcardController.generate,
 );
 

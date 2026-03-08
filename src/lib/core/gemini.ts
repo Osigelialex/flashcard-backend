@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, createUserContent } from "@google/genai";
 import { logger } from "@lib/core/logger";
 import { SYSTEM_PROMPT } from "./prompt";
 import { HttpException } from "./error";
@@ -23,11 +23,39 @@ export default class GeminiService {
     this.client = new GoogleGenAI({ apiKey: geminiApiKey });
   }
 
-  public async generateFlashCards(notes: string): Promise<FlashcardResponse> {
+  public async generateFlashCards(
+    input: string | { path: string; mimeType: string; displayName: string },
+  ): Promise<FlashcardResponse> {
     try {
+      let contents: any;
+
+      if (typeof input === "string") {
+        contents = input;
+      } else {
+        const uploadedFile = await this.client.files.upload({
+          file: input.path,
+          config: {
+            mimeType: input.mimeType,
+            displayName: input.displayName,
+          },
+        });
+
+        contents = [
+          {
+            fileData: {
+              fileUri: uploadedFile.uri,
+              mimeType: uploadedFile.mimeType,
+            },
+          },
+          {
+            text: SYSTEM_PROMPT,
+          },
+        ];
+      }
+
       const response = await this.client.models.generateContent({
         model: "gemini-2.5-flash",
-        contents: notes,
+        contents,
         config: {
           systemInstruction: SYSTEM_PROMPT,
           responseMimeType: "application/json",

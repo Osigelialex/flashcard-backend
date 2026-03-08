@@ -102,9 +102,12 @@ export class FlashcardService {
     });
   }
 
-  public async generateAndSaveFlashcards(userId: string, notes: string) {
+  public async generateAndSaveFlashcards(
+    userId: string,
+    input: string | { path: string; mimeType: string; displayName: string },
+  ) {
     const flashcardResponse =
-      await this.geminiService.generateFlashCards(notes);
+      await this.geminiService.generateFlashCards(input);
 
     const flashcardSet = await prisma.flashCardSet.create({
       data: {
@@ -127,8 +130,8 @@ export class FlashcardService {
     });
 
     return {
-      ...flashcardResponse,
       id: flashcardSet.id,
+      ...flashcardResponse,
     };
   }
 
