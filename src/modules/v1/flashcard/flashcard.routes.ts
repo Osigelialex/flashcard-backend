@@ -3,6 +3,7 @@ import FlashcardController from "./flashcard.controller";
 import dtoValidationMiddleware from "@middlewares/validator.middleware";
 import {
   GenerateFlashcardDto,
+  QueryFlashCardDTO,
   UpdateFlashCardDTO,
   UpdateFlashcardSetDTO,
 } from "./flashcard.dto";
@@ -37,6 +38,7 @@ router.get(
 router.get(
   "/sets/:id",
   authMiddleware,
+  dtoValidationMiddleware(QueryFlashCardDTO, "query"),
   FlashcardController.getFlashCardSetById,
 );
 

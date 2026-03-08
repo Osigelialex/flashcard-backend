@@ -5,18 +5,28 @@ import { PaginationDTO } from "@lib/core/dto";
 import { appConstants } from "@config/constants";
 import { HttpException } from "@lib/core/error";
 import { StatusCodes } from "http-status-codes";
-import { UpdateFlashCardDTO, UpdateFlashcardSetDTO } from "./flashcard.dto";
+import {
+  QueryFlashCardDTO,
+  UpdateFlashCardDTO,
+  UpdateFlashcardSetDTO,
+} from "./flashcard.dto";
 
 export class FlashcardService {
   private readonly geminiService: GeminiService = new GeminiService(
     appConfig.app.geminiApiKey,
   );
 
-  public async getFlashCardSetById(id: string) {
+  public async getFlashCardSetById(id: string, dto: QueryFlashCardDTO) {
+    const where: any = {};
+    if (dto.type) where.type = dto.type;
+    if (dto.bloomLevel) where.bloomLevel = dto.bloomLevel;
+
     const flashCardSet = await prisma.flashCardSet.findUnique({
       where: { id },
       include: {
-        flashCards: true,
+        flashCards: {
+          where,
+        },
       },
     });
 
@@ -56,7 +66,17 @@ export class FlashcardService {
   }
 
   public async updateFlashCardSet(setId: string, dto: UpdateFlashcardSetDTO) {
-    await this.getFlashCardSetById(setId);
+    const flashCardSet = await prisma.flashCardSet.findUnique({
+      where: { id: setId },
+    });
+
+    if (!flashCardSet) {
+      throw new HttpException(
+        StatusCodes.NOT_FOUND,
+        "Flash card set not found",
+      );
+    }
+
     const updateFlashCardSet = await prisma.flashCardSet.update({
       where: { id: setId },
       data: dto,
@@ -66,7 +86,17 @@ export class FlashcardService {
   }
 
   public async deleteFlashCardSet(setId: string) {
-    await this.getFlashCardSetById(setId);
+    const flashCardSet = await prisma.flashCardSet.findUnique({
+      where: { id: setId },
+    });
+
+    if (!flashCardSet) {
+      throw new HttpException(
+        StatusCodes.NOT_FOUND,
+        "Flash card set not found",
+      );
+    }
+
     await prisma.flashCardSet.delete({
       where: { id: setId },
     });

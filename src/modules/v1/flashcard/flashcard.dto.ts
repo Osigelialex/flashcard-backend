@@ -1,3 +1,4 @@
+import { PaginationDTO } from "@lib/core/dto";
 import { BloomLevel, CardType } from "@prisma/client";
 import { IsString, IsNotEmpty, IsOptional, IsEnum } from "class-validator";
 
@@ -30,6 +31,18 @@ export class UpdateFlashCardDTO {
   @IsOptional()
   answer: string;
 
+  @IsEnum(CardType)
+  @IsNotEmpty()
+  @IsOptional()
+  type: CardType;
+
+  @IsEnum(BloomLevel)
+  @IsNotEmpty()
+  @IsOptional()
+  bloomLevel: BloomLevel;
+}
+
+export class QueryFlashCardDTO {
   @IsEnum(CardType)
   @IsNotEmpty()
   @IsOptional()

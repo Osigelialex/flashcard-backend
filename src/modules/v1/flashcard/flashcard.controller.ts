@@ -8,6 +8,7 @@ export default class FlashcardController {
   static getFlashCardSetById = async (req: Request, res: Response) => {
     const data = await this.flashcardService.getFlashCardSetById(
       req.params.id as any,
+      req.validated?.query,
     );
 
     return res.status(StatusCodes.OK).json({
