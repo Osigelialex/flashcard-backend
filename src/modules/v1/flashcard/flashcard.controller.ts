@@ -32,6 +32,29 @@ export default class FlashcardController {
     });
   };
 
+  static updateFlashCardSet = async (req: Request, res: Response) => {
+    const result = await this.flashcardService.updateFlashCardSet(
+      req.params.id as any,
+      req.body,
+    );
+    return res.status(StatusCodes.OK).json({
+      status: true,
+      message: "Flashcard sets retrieved",
+      data: result,
+    });
+  };
+
+  static deleteFlashCardSet = async (req: Request, res: Response) => {
+    const result = await this.flashcardService.deleteFlashCardSet(
+      req.params.id as any,
+    );
+    return res.status(StatusCodes.OK).json({
+      status: true,
+      message: "Flashcard set deleted",
+      data: null,
+    });
+  };
+
   static generate = async (req: Request, res: Response) => {
     const { notes } = req.body;
     const userId = req.user.id;

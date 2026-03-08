@@ -5,7 +5,7 @@ import { PaginationDTO } from "@lib/core/dto";
 import { appConstants } from "@config/constants";
 import { HttpException } from "@lib/core/error";
 import { StatusCodes } from "http-status-codes";
-import { UpdateFlashCardDTO } from "./flashcard.dto";
+import { UpdateFlashCardDTO, UpdateFlashcardSetDTO } from "./flashcard.dto";
 
 export class FlashcardService {
   private readonly geminiService: GeminiService = new GeminiService(
@@ -53,6 +53,23 @@ export class FlashcardService {
         skipped: skip,
       },
     };
+  }
+
+  public async updateFlashCardSet(setId: string, dto: UpdateFlashcardSetDTO) {
+    await this.getFlashCardSetById(setId);
+    const updateFlashCardSet = await prisma.flashCardSet.update({
+      where: { id: setId },
+      data: dto,
+    });
+
+    return updateFlashCardSet;
+  }
+
+  public async deleteFlashCardSet(setId: string) {
+    await this.getFlashCardSetById(setId);
+    await prisma.flashCardSet.delete({
+      where: { id: setId },
+    });
   }
 
   public async generateAndSaveFlashcards(userId: string, notes: string) {

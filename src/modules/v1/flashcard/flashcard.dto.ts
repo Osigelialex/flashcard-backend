@@ -7,6 +7,18 @@ export class GenerateFlashcardDto {
   notes: string;
 }
 
+export class UpdateFlashcardSetDTO {
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  topic: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  summary: string;
+}
+
 export class UpdateFlashCardDTO {
   @IsString()
   @IsNotEmpty()
