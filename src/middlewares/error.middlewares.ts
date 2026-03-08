@@ -10,7 +10,7 @@ export const errorHandler = (
 ) => {
   const status = err.statusCode || 500;
   return res.status(status).json({
-    success: false,
+    status: false,
     message: err.message || "Internal Server Error",
     data: null,
   });
@@ -22,7 +22,7 @@ export const notFoundHandler = (
   next: NextFunction,
 ) => {
   return res.status(StatusCodes.NOT_FOUND).json({
-    success: false,
+    status: false,
     message: "Resource not found",
     data: null,
   });
