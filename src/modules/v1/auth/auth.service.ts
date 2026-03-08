@@ -56,6 +56,19 @@ export default class AuthService {
 
     return {
       accessToken: token,
+      user,
     };
+  }
+
+  static async me(userId: string) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new HttpException(StatusCodes.NOT_FOUND, "User not found");
+    }
+
+    return user;
   }
 }

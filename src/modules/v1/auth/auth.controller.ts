@@ -20,4 +20,13 @@ export default class AuthController {
       data: token,
     });
   };
+
+  static me = async (req: Request, res: Response) => {
+    const result = await AuthService.me(req.user.id);
+    return res.status(StatusCodes.OK).json({
+      status: true,
+      message: "User retrieved successfully",
+      data: result,
+    });
+  };
 }
