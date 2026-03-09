@@ -118,8 +118,15 @@ export class FlashcardService {
           create: flashcardResponse.flashcards.map((card) => ({
             question: card.question,
             answer: card.answer,
-            type: card.type,
-            bloomLevel: card.bloomLevel,
+            type: card.type === "term" ? "term" : "qa",
+            bloomLevel: [
+              "recall",
+              "comprehension",
+              "application",
+              "analysis",
+            ].includes(card.bloomLevel)
+              ? card.bloomLevel
+              : "recall",
             userId: userId,
           })),
         },

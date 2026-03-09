@@ -43,8 +43,8 @@ Respond with ONLY valid JSON — no markdown, no preamble.
     {
       "question": "string",
       "answer": "string",
-      "type": "term" | "qa",
-      "bloomLevel": "recall" | "comprehension" | "application" | "analysis"
+      "type": "term" or "qa" (MUST be "term" or "qa"),
+      "bloomLevel": "recall" | "comprehension" | "application" | "analysis" (MUST be one of these)
     }
   ]
 }
