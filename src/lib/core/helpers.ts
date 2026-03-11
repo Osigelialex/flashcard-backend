@@ -9,6 +9,19 @@ export const generateToken = (length: number) => {
 
 export const nowInSec = () => Math.floor(Date.now() / 1000);
 
+export const escapeCsv = (text: string) => {
+  if (!text) return "";
+  const escaped = text.replace(/"/g, '""');
+  if (
+    escaped.includes(",") ||
+    escaped.includes("\n") ||
+    escaped.includes("\r")
+  ) {
+    return `"${escaped}"`;
+  }
+  return escaped;
+};
+
 export function generateOtp(length: number = 6): string {
   const digits = "0123456789";
   let otp = "";

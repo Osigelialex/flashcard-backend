@@ -69,4 +69,6 @@ router.delete(
   FlashcardController.deleteFlashCardSet,
 );
 
+router.get("/sets/:id/export", authMiddleware, FlashcardController.exportToCsv);
+
 export default router;

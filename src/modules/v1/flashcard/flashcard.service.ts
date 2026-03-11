@@ -5,6 +5,7 @@ import { PaginationDTO } from "@lib/core/dto";
 import { appConstants } from "@config/constants";
 import { HttpException } from "@lib/core/error";
 import { StatusCodes } from "http-status-codes";
+import { escapeCsv } from "@lib/core/helpers";
 import {
   QueryFlashCardDTO,
   UpdateFlashCardDTO,
@@ -171,5 +172,36 @@ export class FlashcardService {
     await prisma.flashCard.delete({
       where: { id: flashcardId },
     });
+  }
+
+  public async exportFlashCardSetToCsv(setId: string) {
+    const flashCardSet = await prisma.flashCardSet.findUnique({
+      where: { id: setId },
+      include: {
+        flashCards: true,
+      },
+    });
+
+    if (!flashCardSet) {
+      throw new HttpException(
+        StatusCodes.NOT_FOUND,
+        "Flash card set not found",
+      );
+    }
+
+    let csvContent = "";
+
+    flashCardSet.flashCards.forEach((card) => {
+      const front = escapeCsv(card.question);
+      const back = escapeCsv(card.answer);
+      csvContent += `${front},${back}\n`;
+    });
+
+    const filename = `${flashCardSet.topic.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_flashcards.csv`;
+
+    return {
+      csvContent,
+      filename,
+    };
   }
 }

@@ -112,4 +112,14 @@ export default class FlashcardController {
       data: null,
     });
   };
+
+  static exportToCsv = async (req: Request, res: Response) => {
+    const { csvContent, filename } =
+      await this.flashcardService.exportFlashCardSetToCsv(req.params.id as any);
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+
+    return res.status(StatusCodes.OK).send(csvContent);
+  };
 }
